@@ -8,12 +8,43 @@ from pathlib import Path
 from docxtpl import DocxTemplate
 from datetime import datetime
 
+#Docx will be used to scan our file for the variables enterd by the user
+import docx
+
 #Used to combat errors when users didn't specifiy a filepath
 def is_valid_path(filepath):
     if filepath and Path(filepath).exists():
         return True
     sg.popup_error("Filepath not correct")
     return False
+
+#Here we will find what the user wants us to fill in using our code
+def scan_document(filename):
+    # This will scan the document for any part of the text that has "{{name_of_input_here}}"
+    # Like the template file has {{event_name_informal}} 
+    print("hi")
+    doc = docx.Document(filename)
+    fulltext = []
+    allvars = []
+    amountofvars = 0
+    currentVar = ""
+    varChars = '{{'
+
+    #Go through each paragraph in the word file
+    for paragraph in doc.paragraphs:
+        # Here we check each words in the file for {{}} which should contain a variable
+        currentPar = paragraph.text
+        index = 0
+        for x in len(currentPar):
+            if currentPar[index] != '{':
+                index += 1
+                continue
+            
+            index += 1
+                
+
+        
+            
 
 #We use this to edit the document
 def edit_document(file_path, final_document):
@@ -37,13 +68,12 @@ def edit_document(file_path, final_document):
     doc.save(final_document)
 
 #Function used for most/all of our gui needs
-def gui():
+def gui_scan():
     #The layout is for what elements our GUI has
     #With the option to browse for you template file aswell as pick a final destination for your completed file
     layout = [
         [sg.Text("Template file:"), sg.Input(key="-IN-"), sg.FileBrowse(file_types=(("Word files", "*.docx"),))],
-        [sg.Text("Output file:"), sg.Input(key="-OUT-"), sg.FileBrowse()],
-        [sg.Exit(), sg.Button("Fill in the document")],
+        [sg.Exit(), sg.Button("Scan file")],
     ]
 
     #Creates the window based on our layout
@@ -53,7 +83,7 @@ def gui():
         event, values = window.read()
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
-        if event == "Fill in the document":
+        if event == "Scan file":
             #check if the user has enterd a valid filepath
             if is_valid_path(values["-IN-"]):
                 sg.popup_error("not yet impletmented")
@@ -61,4 +91,4 @@ def gui():
 
 #-------------CODE RUN---------------
 
-gui()
+gui_scan()
