@@ -22,25 +22,39 @@ def is_valid_path(filepath):
 def scan_document(filename):
     # This will scan the document for any part of the text that has "{{name_of_input_here}}"
     # Like the template file has {{event_name_informal}} 
-    print("hi")
     doc = docx.Document(filename)
-    fulltext = []
     allvars = []
     amountofvars = 0
     currentVar = ""
-    varChars = '{{'
+    #Checks if we are at the first of the two {{ indicating there is a variable to come
+    firstSquiggly = True
+    countChars = False
 
     #Go through each paragraph in the word file
     for paragraph in doc.paragraphs:
         # Here we check each words in the file for {{}} which should contain a variable
         currentPar = paragraph.text
-        index = 0
-        for x in len(currentPar):
-            if currentPar[index] != '{':
-                index += 1
+        for x in range(len(currentPar)):
+            if countChars == True and currentPar[x] != '}':
+                currentVar = currentVar + currentPar[x]
                 continue
-            
-            index += 1
+            else:
+                countChars = False
+                if currentPar[x] == '{' and firstSquiggly == True:
+                    allvars.append(currentVar)
+                    amountofvars += 1
+                    currentVar = ""
+                    firstSquiggly = False
+                    continue
+                elif currentPar[x] == '{' and firstSquiggly == False:
+                    countChars = True
+                    firstSquiggly = True
+
+    #Needs fixing later on. First element is wrong but im lost
+    amountofvars -= 1
+    allvars.remove("")
+    print(allvars)
+    return allvars       
                 
 
         
@@ -48,6 +62,8 @@ def scan_document(filename):
 
 #We use this to edit the document
 def edit_document(file_path, final_document):
+    vars = []
+    vars.append(scan_document(file_path))
     #Here goes the path to your template
     doc = DocxTemplate(file_path)
     #this will later be replaced with userinput
@@ -59,9 +75,10 @@ def edit_document(file_path, final_document):
     my_number = "(123) 456 789"
     my_email = "partyguy@gmail.com"
     my_name = "Alexander"
+    context = {}
     #context passed over to the word document
-    context = {'event_name_informal': event_name_informal, 'date': date, 'target_name': target_name, 'event_name':event_name,
-    'rsvp_date': rsvp_date, 'my_number': my_number, 'my_email': my_email, 'my_name': my_name}
+    for x in range(len(vars)):
+        context[vars[x]] = ""
     # Render and save the document at specified filepath
     doc.render(context)
     print("Document completed")
@@ -86,9 +103,35 @@ def gui_scan():
         if event == "Scan file":
             #check if the user has enterd a valid filepath
             if is_valid_path(values["-IN-"]):
-                sg.popup_error("not yet impletmented")
+                vars = []
+                vars.append(scan_document(values["-IN-"]))
+                window.close()
+                gui_check(vars)
+
+    window.close()
+
+def gui_check(vars):
+    layout = []
+    options = []
+    options.append(vars)
+    currentCheckBox = ""
+    for x in range(len(vars)):
+            currentCheckBox = str(options[x])
+            print("Current box is: " + currentCheckBox)
+            layout.append([sg.Checkbox(str(currentCheckBox), default=False)])
+            currentCheckBox = ""
+    
+    layout.append([sg.Exit()])
+
+    window = sg.Window("Select thingy", layout)
+    while True:
+        event, values = window.read()
+        if event in (sg.WINDOW_CLOSED, "Exit"):
+            break
+
     window.close()
 
 #-------------CODE RUN---------------
 
+# scan_document('generator_template_py.docx')
 gui_scan()
