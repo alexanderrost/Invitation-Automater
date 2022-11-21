@@ -1,4 +1,13 @@
 # Project for automaticly generating word files for things like invitations and coverletters based on a given template. Hopefully with UI interface.
+# By Alexander Röst 2022
+
+
+#TODO Curret issues are : Only creates one checkbox when I want one for each variable(not sure how I fix that) ---> Highest prio item
+#TODO Fix the excel scanning and data insertion functions once checkboxes work reliabily, then we can finalize the project
+#TODO Fix layouts and the design of the program, looks like a toddler drew it. Also make it an .exe?
+#TODO Write tests and make sure they work before first github release.
+#TODO CLEAN UP THE CODE AND ADD MORE RELEVANT COMMENTS, also use more standardized language in the code(look up PEP 8 as recommended by a friend)
+#TODO Fix README.md file and clean up the github a little once it's all donezo.
 
 #We use pysimplegui for the GUI element of the program
 import PySimpleGUI as sg
@@ -118,18 +127,28 @@ def gui_check(vars):
     for x in range(len(vars)):
             currentCheckBox = str(options[x])
             print("Current box is: " + currentCheckBox)
-            layout.append([sg.Checkbox(str(currentCheckBox), default=False)])
+            layout.append([sg.CB("" + currentCheckBox, default=False, key= "-CB" + str(x) + "-")])
             currentCheckBox = ""
     
     layout.append([sg.Exit()])
 
-    window = sg.Window("Select thingy", layout)
+    window = sg.Window("Select thingy", layout, size=(500, 500))
     while True:
         event, values = window.read()
         if event in (sg.WINDOW_CLOSED, "Exit"):
             break
 
     window.close()
+
+#This file will be used to scan excel files to determin what data goes to what variable
+def gui_xcel_check():
+    return 0
+
+# This will take the data from the forms and put it in the right place on the invitations
+def gui_insert_data():
+    return 0
+
+
 
 #-------------CODE RUN---------------
 
