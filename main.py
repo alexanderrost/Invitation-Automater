@@ -2,8 +2,7 @@
 # By Alexander Röst 2022
 
 
-#TODO Curret issues are : Only creates one checkbox when I want one for each variable(not sure how I fix that) ---> Highest prio item
-#TODO Fix the excel scanning and data insertion functions once checkboxes work reliabily, then we can finalize the project
+#TODO Fix the excel scanning and data insertion functions once checkboxes work reliabily, then we can finalize the project --> Highest prio
 #TODO Fix layouts and the design of the program, looks like a toddler drew it. Also make it an .exe?
 #TODO Write tests and make sure they work before first github release.
 #TODO CLEAN UP THE CODE AND ADD MORE RELEVANT COMMENTS, also use more standardized language in the code(look up PEP 8 as recommended by a friend)
@@ -19,6 +18,9 @@ from datetime import datetime
 
 #Docx will be used to scan our file for the variables enterd by the user
 import docx
+import re
+
+
 
 #Used to combat errors when users didn't specifiy a filepath
 def is_valid_path(filepath):
@@ -62,7 +64,6 @@ def scan_document(filename):
     #Needs fixing later on. First element is wrong but im lost
     amountofvars -= 1
     allvars.remove("")
-    print(allvars)
     return allvars       
                 
 
@@ -75,15 +76,6 @@ def edit_document(file_path, final_document):
     vars.append(scan_document(file_path))
     #Here goes the path to your template
     doc = DocxTemplate(file_path)
-    #this will later be replaced with userinput
-    event_name_informal = "Big party"
-    date = datetime.today().strftime("%d/%B/%Y")
-    target_name = "John"
-    event_name = "Big Party at my house!"
-    rsvp_date = "11/12/23"
-    my_number = "(123) 456 789"
-    my_email = "partyguy@gmail.com"
-    my_name = "Alexander"
     context = {}
     #context passed over to the word document
     for x in range(len(vars)):
@@ -95,6 +87,7 @@ def edit_document(file_path, final_document):
 
 #Function used for most/all of our gui needs
 def gui_scan():
+    sg.theme("Python")
     #The layout is for what elements our GUI has
     #With the option to browse for you template file aswell as pick a final destination for your completed file
     layout = [
@@ -112,8 +105,12 @@ def gui_scan():
         if event == "Scan file":
             #check if the user has enterd a valid filepath
             if is_valid_path(values["-IN-"]):
+                #This is a really ugly solution, I really have to fix this later on :) but ive spent an ungodly amount of time getting this to work
                 vars = []
-                vars.append(scan_document(values["-IN-"]))
+                tempvars = []
+                tempvars = scan_document(values["-IN-"])
+                for x in range(len(tempvars)):
+                    vars.append(tempvars[x])
                 window.close()
                 gui_check(vars)
 
@@ -121,18 +118,15 @@ def gui_scan():
 
 def gui_check(vars):
     layout = []
-    options = []
-    options.append(vars)
     currentCheckBox = ""
     for x in range(len(vars)):
-            currentCheckBox = str(options[x])
-            print("Current box is: " + currentCheckBox)
+            currentCheckBox = str(vars[x])
             layout.append([sg.CB("" + currentCheckBox, default=False, key= "-CB" + str(x) + "-")])
             currentCheckBox = ""
     
     layout.append([sg.Exit()])
 
-    window = sg.Window("Select thingy", layout, size=(500, 500))
+    window = sg.Window("Select thingy", layout)
     while True:
         event, values = window.read()
         if event in (sg.WINDOW_CLOSED, "Exit"):
