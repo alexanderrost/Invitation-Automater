@@ -120,7 +120,7 @@ def gui_check(vars):
     layout = []
     layout.append([sg.Text('Choose the options you DO NOT want to be dynamic', key='-TEXT-')])
     currentCheckBox = ""
-    for x in range(len(vars)):
+    for x in range(len(vars)): 
             currentCheckBox = str(vars[x])
             layout.append([sg.CB("" + currentCheckBox, default=False, key= "-CB" + str(x) + "-")])
             currentCheckBox = ""
