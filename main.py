@@ -1,5 +1,5 @@
 # Project for automaticly generating word files for things like invitations and coverletters based on a given template. Hopefully with UI interface.
-# By Alexander Röst 2022
+# By Alexanderrost 2022
 
 
 #TODO Fix the excel scanning and data insertion functions once checkboxes work reliabily, then we can finalize the project --> Highest prio
@@ -7,18 +7,18 @@
 #TODO Write tests and make sure they work before first github release.
 #TODO CLEAN UP THE CODE AND ADD MORE RELEVANT COMMENTS, also use more standardized language in the code(look up PEP 8 as recommended by a friend)
 #TODO Fix README.md file and clean up the github a little once it's all donezo.
+#TODO Clean up the scanning document function.
 
 #We use pysimplegui for the GUI element of the program
+#We might change this out for customtkinter once I get it working.
 import PySimpleGUI as sg
 from pathlib import Path
 
 #We use docxtpl to edit the word template
 from docxtpl import DocxTemplate
-from datetime import datetime
 
 #Docx will be used to scan our file for the variables enterd by the user
 import docx
-import re
 
 
 
@@ -118,6 +118,7 @@ def gui_scan():
 
 def gui_check(vars):
     layout = []
+    layout.append([sg.Text('Choose the options you DO NOT want to be dynamic', key='-TEXT-')])
     currentCheckBox = ""
     for x in range(len(vars)):
             currentCheckBox = str(vars[x])
@@ -126,7 +127,7 @@ def gui_check(vars):
     
     layout.append([sg.Exit()])
 
-    window = sg.Window("Select thingy", layout)
+    window = sg.Window("Dynamic options", layout, resizable=True)
     while True:
         event, values = window.read()
         if event in (sg.WINDOW_CLOSED, "Exit"):
